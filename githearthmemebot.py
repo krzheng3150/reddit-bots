@@ -15,8 +15,6 @@ reddit = praw.Reddit('bot2')
 # /r/hearthstone refugee
 subreddit = reddit.subreddit("hearthstonecirclejerk")
 
-comment_cache = deque(maxlen=200)
-
 kappa = [("(^|[^A-Za-z0-9\'\"])[Gg][Ii][Tt] [Gg][Uu][Dd]([^A-Za-z0-9\'\"]|$)", "    git: 'gud' is not a git command. See 'git --help'."),
          ("^[Gg]it \-?\-?[Hh]elp$", "See [here](https://education.github.com/git-cheat-sheet-education.pdf) for more information."),
          ("^[^A-Za-z0-9]*[Aa][Ll][Ll] *[Mm][Ii][Nn][Ii][Oo][Nn][Ss][^A-Za-z0-9]*$", "**Taunt. Taunt. Taunt. Taunt. Taunt.**"),
@@ -50,6 +48,7 @@ def bot_action(c, r):
     c.reply(r)
 
 start_time = time.time()
+ref_time = start_time - 90
 print "bot is running..."
 running = True
 i = 0
@@ -64,9 +63,9 @@ while running:
         if i % 256 == 0:
             print i
         for comment in commentz:
-            if comment.id in comment_cache:
+            if comment.created_utc <= ref_time:
                 break
-            comment_cache.append(comment.id)
+            ref_time = comment.created_utc + 1
             for x in kappa:
                 bot_condition_met = check_condition(comment, x[0])
                 if bot_condition_met:
