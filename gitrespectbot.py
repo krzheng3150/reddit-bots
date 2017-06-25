@@ -22,14 +22,17 @@ kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respect
 kappa = map(lambda x: (re.compile(x[0]), x[1]), kappa)
 
 def check_condition(c, regex):
-    text = c.body
+    title = c.title
+    text = c.selftext
+    if re.findall(regex, title):
+        return True
     if len(text) > 500:
         return False
-    matches = set(re.findall(regex, text))
-    return True if matches else False
+    return True if re.findall(regex, text) else False
 
 def bot_action(c, r):
-    print(c.body.encode('utf-8'))
+    print(c.title.encode('utf-8'))
+    print(c.selftext.encode('utf-8'))
     c.reply(r)
 
 start_time = time.time()
@@ -44,7 +47,7 @@ while running:
         if time.time() - start_time > 43000:
             print("I'm gonna rest for a bit...")
             sys.exit(0)
-        commentz = subreddit.comments(limit=100)
+        commentz = subreddit.new(limit=100)
         i = (i + 1) % 65536
         if i % 256 == 0:
             print i
