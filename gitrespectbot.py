@@ -13,7 +13,11 @@ reddit = praw.Reddit('bot3')
 
 subreddit = reddit.subreddit("all")
 
+dest_subreddit = reddit.subreddit("Pay_Respects")
+
 comment_cache = deque(maxlen=200)
+
+username = "PayRespects-Bot"
 
 kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "F"),
          ("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Xx][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "X"),
@@ -22,17 +26,22 @@ kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respect
 kappa = map(lambda x: (re.compile(x[0]), x[1]), kappa)
 
 def check_condition(c, regex):
+    if username == c.author.name:
+        return False
     title = c.title
     text = c.selftext
     if re.findall(regex, title):
         return True
-    if len(text) > 500:
+    if len(text) > 1000:
         return False
     return True if re.findall(regex, text) else False
 
 def bot_action(c, r):
     print(c.title.encode('utf-8'))
     print(c.selftext.encode('utf-8'))
+    # Direct the post to the Pay_Respects subreddit
+    dest_subreddit.submit(title=c.title, url="https://www.reddit.com" + c.permalink, resubmit=False)
+    # Reply to pay respects
     c.reply(r)
 
 start_time = time.time()

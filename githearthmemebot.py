@@ -40,8 +40,6 @@ kappa = [("(^|[^A-Za-z0-9\'\"])[Gg][Ii][Tt] [Gg][Uu][Dd]([^A-Za-z0-9\'\"]|$)", "
          ("(^|[^A-Za-z0-9])[Rr][Oo][Aa][Cc][Hh] *[Bb][Oo][Yy]([^A-Za-z0-9]|$)", "Support the pyramid roach boy =)")]
 kappa = map(lambda x: (re.compile(x[0]), x[1]), kappa)
 
-signature = "\n\n*****\n\n^The ^bot ^posts ^IMMEDIATELY ^after ^a ^thread ^is ^made ^and ^steals ^upvotes ^and ^time ^from ^REAL ^HUMAN ^USERS. ^If ^it ^doesn't ^have ^a ^pasta ^it ^just ^says ^'f2p ^btw' ^which ^is ^boring, ^spammy, ^and ^again ^steals ^KARMA. ^The ^bot ^only ^needs ^ONE ^mention ^of ^the ^right ^word ^and ^it ^goes ^on ^a ^tirade ^about ^priest ^or ^gwent. ^It's ^basically ^a ^general ^nuisance ^and ^brings ^little ^if ^not ^no ^entertainment."
-
 def check_condition(c, regex):
     if username == c.author.name:
         return False
@@ -51,7 +49,7 @@ def check_condition(c, regex):
 
 def bot_action(c, r):
     print(c.selftext.encode('utf-8'))
-    c.reply(r + signature)
+    c.reply(r)
 
 start_time = time.time()
 ref_time = start_time - 90
