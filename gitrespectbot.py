@@ -40,7 +40,7 @@ def bot_action(c, r):
     print(c.title.encode('utf-8'))
     print(c.selftext.encode('utf-8'))
     # Direct the post to the Pay_Respects subreddit
-    dest_subreddit.submit(title=c.title, url="https://www.reddit.com" + c.permalink, resubmit=False)
+    dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
     # Reply to pay respects
     c.reply(r)
 

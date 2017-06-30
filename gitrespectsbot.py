@@ -37,7 +37,7 @@ def check_condition(c, regex):
 def bot_action(c, r):
     print(c.body.encode('utf-8'))
     # Direct the post to the Pay_Respects subreddit
-    dest_subreddit.submit(title=c.link_title, url=c.link_permalink, resubmit=False)
+    dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.link_title), url=c.link_permalink, resubmit=False)
     # Reply to pay respects
     c.reply(r)
 
