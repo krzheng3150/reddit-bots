@@ -19,6 +19,8 @@ comment_cache = deque(maxlen=200)
 
 username = "PayRespects-Bot"
 
+complained_subs = ["r/dankmemes"]
+
 kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "F"),
          ("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Xx][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "X"),
          ("(^|[^A-Za-z0-9\'\" ]) *[Hh]old *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "FFFFFFFFFFFFFFFFFFFF"),
@@ -40,7 +42,10 @@ def bot_action(c, r):
     print(c.title.encode('utf-8'))
     print(c.selftext.encode('utf-8'))
     # Direct the post to the Pay_Respects subreddit
-    dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
+    if c.subreddit_name_prefixed.lower in complained_subs:
+        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), selftext="https://www.reddit.com" + c.permalink, resubmit=False)
+    else:
+        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
     # Reply to pay respects
     c.reply(r)
 
