@@ -9,7 +9,7 @@ import sys
 
 start_time = datetime.now()
 
-reddit = praw.Reddit('bot3')
+reddit = praw.Reddit('bot7')
 
 subreddit = reddit.subreddit("all")
 
@@ -19,13 +19,13 @@ comment_cache = deque(maxlen=200)
 
 username = "PayRespects-Bot"
 
-complained_subs = []
+dest_subreddit = reddit.subreddit("REEEEEEEEEE")
 
-kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "F"),
-         ("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Xx][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "X"),
-         ("(^|[^A-Za-z0-9\'\" ]) *[Hh]old *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "FFFFFFFFFFFFFFFFFFFF"),
-         ("(^|[^A-Za-z0-9\'\" ]) *[Hh]old *[\'\"]?[Xx][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "XXXXXXXXXXXXXXXXXXXX")]
-kappa = map(lambda x: (re.compile(x[0]), x[1]), kappa)
+username = "R10E"
+
+kappa = re.compile("(^|[^A-Za-z0-9])[Rr][Ee]{3,}([^A-Za-z0-9]|$)")
+
+complained_subs = []
 
 def check_condition(c, regex):
     if username == c.author.name or dest_subreddit.display_name.lower() in c.subreddit_name_prefixed.lower():
@@ -34,20 +34,16 @@ def check_condition(c, regex):
     text = c.selftext
     if re.findall(regex, title):
         return True
-    if len(text) > 1000:
-        return False
     return True if re.findall(regex, text) else False
 
-def bot_action(c, r):
+def bot_action(c):
     print(c.title.encode('utf-8'))
     print(c.selftext.encode('utf-8'))
-    # Direct the post to the Pay_Respects subreddit
+    # Direct the post to the REEEEEEEEEE subreddit
     if c.subreddit_name_prefixed.lower() in complained_subs:
         dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), selftext="https://www.reddit.com" + c.permalink, resubmit=False)
     else:
         dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
-    # Reply to pay respects
-    c.reply(r)
 
 start_time = time.time()
 print "bot is running..."
@@ -69,11 +65,10 @@ while running:
             if comment.id in comment_cache:
                 break
             comment_cache.append(comment.id)
-            for x in kappa:
-                bot_condition_met = check_condition(comment, x[0])
-                if bot_condition_met:
-                    bot_action(comment, x[1])
-                backoff = 8
+            bot_condition_met = check_condition(comment, kappa)
+            if bot_condition_met:
+                bot_action(comment)
+            backoff = 8
     except KeyboardInterrupt:
         running = False
     except Exception as e:

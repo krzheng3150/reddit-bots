@@ -17,9 +17,9 @@ dest_subreddit = reddit.subreddit("Pay_Respects")
 
 comment_cache = deque(maxlen=200)
 
-username = "PayRespects-Bot"
+usernames = ["PayRespects-Bot", "TotesMessenger"]
 
-complained_subs = ["r/dankmemes"]
+complained_subs = []
 
 kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "F"),
          ("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Xx][\'\"]? *to +pay +respects? *([^A-Za-z0-9\'\" ]|$)", "X"),
@@ -28,7 +28,7 @@ kappa = [("(^|[^A-Za-z0-9\'\" ]) *[Pp]ress *[\'\"]?[Ff][\'\"]? *to +pay +respect
 kappa = map(lambda x: (re.compile(x[0]), x[1]), kappa)
 
 def check_condition(c, regex):
-    if username == c.author.name:
+    if c.author.name in usernames or dest_subreddit.display_name.lower() in c.subreddit_name_prefixed.lower():
         return False
     text = c.body
     if len(text) > 500:
@@ -39,10 +39,10 @@ def check_condition(c, regex):
 def bot_action(c, r):
     print(c.body.encode('utf-8'))
     # Direct the post to the Pay_Respects subreddit
-    if c.subreddit_name_prefixed.lower in complained_subs:
-        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.link_title), selftext=c.link_permalink, resubmit=False)
+    if c.subreddit_name_prefixed.lower() in complained_subs:
+        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.link_title), selftext=c.link_permalink + c.id, resubmit=False)
     else:
-        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.link_title), url=c.link_permalink, resubmit=False)
+        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.link_title), url=c.link_permalink + c.id, resubmit=False)
     # Reply to pay respects
     c.reply(r)
 
