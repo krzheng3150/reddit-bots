@@ -13,22 +13,20 @@ reddit = praw.Reddit('bot7')
 
 subreddit = reddit.subreddit("all")
 
-dest_subreddit = reddit.subreddit("Pay_Respects")
-
 comment_cache = deque(maxlen=200)
-
-username = "PayRespects-Bot"
-
-dest_subreddit = reddit.subreddit("REEEEEEEEEE")
 
 username = "R10E"
 
-kappa = re.compile("(^|[^A-Za-z0-9])[Rr][Ee]{3,}([^A-Za-z0-9]|$)")
+blacklist_subs = ["r/neoliberal", "r/sbubby"]
 
-complained_subs = []
+kappa = [(re.compile("(^|[^A-Za-z0-9])[Rr][Ee]{3,}([^A-Za-z0-9]|$)"), reddit.subreddit("REEEEEEEEEE")),
+         (re.compile("(^|[^A-Za-z0-9])[Mm][Oo][Nn][Kk][Aa][Ss]([^A-Za-z0-9]|$)"), reddit.subreddit("monkaS")),
+         (re.compile("(^|[^A-Za-z0-9])([Vv][Oo][Hh][Ii][Yy][Oo]|[Kk]on[Cc]ha|[Tt]e[Hh]e[Pp][eo]lo|[Pp]un[Oo]ko)([^A-Za-z0-9]|$)"), reddit.subreddit("VoHiYo"))]
 
-def check_condition(c, regex):
-    if username == c.author.name or dest_subreddit.display_name.lower() in c.subreddit_name_prefixed.lower():
+def check_condition(c, regexsub):
+    regex = regexsub[0]
+    sub = regexsub[1]
+    if username == c.author.name or sub.display_name.lower() in c.subreddit_name_prefixed.lower():
         return False
     title = c.title
     text = c.selftext
@@ -36,14 +34,13 @@ def check_condition(c, regex):
         return True
     return True if re.findall(regex, text) else False
 
-def bot_action(c):
+def bot_action(c, s):
     print(c.title.encode('utf-8'))
     print(c.selftext.encode('utf-8'))
-    # Direct the post to the REEEEEEEEEE subreddit
-    if c.subreddit_name_prefixed.lower() in complained_subs:
-        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), selftext="https://www.reddit.com" + c.permalink, resubmit=False)
+    if "monkaS" != s.display_name and c.subreddit_name_prefixed.lower() not in blacklist_subs:
+        s.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
     else:
-        dest_subreddit.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), url="https://www.reddit.com" + c.permalink, resubmit=False)
+        s.submit(title="[{}] {}".format(c.subreddit_name_prefixed, c.title), selftext="https://www.reddit.com" + c.permalink, resubmit=False)
 
 start_time = time.time()
 print "bot is running..."
@@ -62,13 +59,21 @@ while running:
         if i % 256 == 0:
             print i
         for comment in commentz:
-            if comment.id in comment_cache:
-                break
-            comment_cache.append(comment.id)
-            bot_condition_met = check_condition(comment, kappa)
-            if bot_condition_met:
-                bot_action(comment)
-            backoff = 8
+            try:
+                if comment.id in comment_cache:
+                    break
+                comment_cache.append(comment.id)
+                for regexsub in kappa:
+                    bot_condition_met = check_condition(comment, regexsub)
+                    if bot_condition_met:
+                        bot_action(comment, regexsub[1])
+                        backoff = 8
+            except Exception as e:
+                print("[ERROR]:{}".format(e))
+                print("sleeping in {} sec".format(backoff))
+                sleep(backoff)
+                if backoff < 1024:
+                    backoff = backoff * 2
     except KeyboardInterrupt:
         running = False
     except Exception as e:
@@ -77,4 +82,3 @@ while running:
         sleep(backoff)
         if backoff < 1024:
             backoff = backoff * 2
-        continue
